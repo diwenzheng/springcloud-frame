@@ -13,7 +13,7 @@ import com.aliyuncs.profile.IClientProfile;
 public class PhoneCode {
 
     public static void main(String[] args) {
-        getPhonemsg("18629572235");
+        getPhonemsg("");
     }
 
 
