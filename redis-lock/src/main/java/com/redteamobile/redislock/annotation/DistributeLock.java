@@ -21,10 +21,12 @@ public @interface DistributeLock {
      */
     String key();
 
+    int waitTime() default 5;
+
     /**
      * 超时时间
      */
-    long timeout() default 5;
+    int timeout() default 5;
 
     /**
      * 时间单位

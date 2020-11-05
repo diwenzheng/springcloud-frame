@@ -5,16 +5,20 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 该类的作用可以把方法上的参数绑定到注解的变量中,注解的语法#{变量名}
+ *  * 能解析类似#{task}或者#{task.taskName}或者{task.project.projectName}
+ * @author zhengdiwen
+ */
 @Component
 public class AnnotationResolver {
 
-    public String resolver(JoinPoint joinpoint, String toResolverStr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public String resolver(JoinPoint joinpoint, String toResolverStr) throws Exception {
         if (StringUtils.isEmpty(toResolverStr)) {
             return null;
         }
@@ -23,7 +27,7 @@ public class AnnotationResolver {
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(toResolverStr);
         while (m.find()) {
-            String key = m.group().replace("#\\{", "").replace("\\}", "");
+            String key = m.group().replaceAll("#\\{", "").replaceAll("\\}", "");
             if (key.contains(".")) {
                 m.appendReplacement(sb, Objects.requireNonNull(complexResolver(joinpoint, key)));
             } else {
@@ -45,7 +49,7 @@ public class AnnotationResolver {
         return null;
     }
 
-    private String complexResolver(JoinPoint joinPoint, String str) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private String complexResolver(JoinPoint joinPoint, String str) throws Exception {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String[] names = methodSignature.getParameterNames();
         Object[] args = joinPoint.getArgs();
@@ -53,9 +57,10 @@ public class AnnotationResolver {
         for (int i = 0; i < names.length; i++) {
             if (strs[0].equals(names[i])) {
                 Object obj = args[i];
-                Method dmethod = obj.getClass().getDeclaredMethod(getMethodName(strs[1]), (Class<?>) null);
+                Method dmethod = obj.getClass().getDeclaredMethod(getMethodName(strs[1]),  null);
                 Object value = dmethod.invoke(args[i]);
-                return Objects.requireNonNull(getValue(value, 1, strs)).toString();
+                // todo 空指针问题
+                return getValue(value, 1, strs).toString();
             }
         }
         return null;
@@ -64,7 +69,7 @@ public class AnnotationResolver {
     private Object getValue(Object obj, int index, String[] strs) {
         try {
             if (obj != null && index < strs.length - 1) {
-                Method method = obj.getClass().getDeclaredMethod(getMethodName(strs[index + 1]), (Class<?>) null);
+                Method method = obj.getClass().getDeclaredMethod(getMethodName(strs[index + 1]), null);
                 obj = method.invoke(obj);
                 getValue(obj, index + 1, strs);
             }
