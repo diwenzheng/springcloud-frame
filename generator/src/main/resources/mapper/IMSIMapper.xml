@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redteamobile.redislock.mapper.IMSIMapper">
+
+    <select id="queryAllInfo" resultType="com.redteamobile.redislock.po.IMSIInfo">
+       SELECT  imsi,province FROM imsi2_location
+    </select>
+
+    <insert id="insertInfos" parameterType="java.util.List" >
+        INSERT INTO imsi2_location VALUES
+        <foreach collection="imsiInfos" item="item" separator=",">
+            (
+             #{item.imsi},#{item.province}
+            )
+        </foreach>
+    </insert>
+    
+    <delete id="deleteInfo">
+        delete from imsi2_location
+    </delete>
+    
+
+</mapper>

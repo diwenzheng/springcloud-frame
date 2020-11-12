@@ -1,0 +1,9 @@
+server:
+  port: 6666
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    connectionInitSqls: "SET NAMES utf8mb4"
+    url: "jdbc:mysql://127.0.0.1:3306/PREPOSE_DB?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE&serverTimezone=GMT%2B8"
+    username: root
+    password: 123456
