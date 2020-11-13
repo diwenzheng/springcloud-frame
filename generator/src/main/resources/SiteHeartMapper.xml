@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redteamobile.es.site.mapper.SiteHeartMapper">
+
+    <select id="list" resultType="com.redteamobile.es.site.po.SiteHeatInfo">
+        SELECT  id,area_name,health_ip,modify,update_time from site_heart_info;
+    </select>
+
+    <select id="getSiteHeartInfoByAreaName" resultType="com.redteamobile.es.site.po.SiteHeatInfo">
+        SELECT area_name,health_ip,modify,update_time from site_heart_info WHERE area_name = #{areaName}
+    </select>
+
+    <update id="updateSiteHeartInfoByAreaName" parameterType="java.util.List">
+
+        <foreach collection="list" item="heartInfo" index="index" open="" close="" separator=";">
+
+            UPDATE site_heart_info
+
+            <trim prefix="set" suffixOverrides=",">
+                <if test="heartInfo.areaName != null" >area_name = #{heartInfo.areaName},</if>
+                <if test="heartInfo.healthIp != null" >health_ip = #{heartInfo.healthIp},</if>
+                <if test="heartInfo.modify != null" >modify = #{heartInfo.modify},</if>
+                <if test="heartInfo.updateTime != null" >update_time = #{heartInfo.updateTime},</if>
+            </trim>
+
+            <where>
+                area_name = #{heartInfo.areaName}
+            </where>
+        </foreach>
+
+
+
+    </update>
+
+
+
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redteamobile.es.site.mapper.SiteBusinessMapper">
+
+    <select id="list" resultType="com.redteamobile.es.site.po.SiteBusinessInfo">
+        SELECT id,area_name,access_ip,status,modify,update_time from site_business_info;
+    </select>
+
+
+    <select id="getSiteBusinessInfoByAreaName" resultType="com.redteamobile.es.site.po.SiteBusinessInfo">
+        SELECT area_name,access_ip,status,modify,update_time WHERE area_name = #{areaName}
+    </select>
+
+    <update id="updateSiteBusinessInfoByAreaName" parameterType="java.util.List">
+        <foreach collection="list" item="businessInfo" index="index" open="" close="" separator=";">
+
+            UPDATE site_business_info
+
+            <trim prefix="set" suffixOverrides=",">
+                <if test="businessInfo.areaName != null" >area_name = #{businessInfo.areaName},</if>
+                <if test="businessInfo.status != null" >status = #{businessInfo.status},</if>
+                <if test="businessInfo.accessIp != null" >access_ip = #{businessInfo.accessIp},</if>
+                <if test="businessInfo.modify != null" >modify = #{businessInfo.modify},</if>
+                <if test="businessInfo.updateTime != null" >update_time = #{businessInfo.updateTime},</if>
+            </trim>
+
+            <where>
+                area_name = #{businessInfo.areaName}
+            </where>
+        </foreach>
+
+
+
+    </update>
+
+
+
+</mapper>
