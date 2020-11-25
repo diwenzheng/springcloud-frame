@@ -1,0 +1,29 @@
+version: '2'
+services:
+  mysql-slave:
+    image: mysql_mysql-slave
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+    restart: always
+    volumes:
+      - /mnt/mysql/data/slave1:/var/lib/mysql
+  mysql-master:
+    image: mysql_mysql-master
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+    links:
+      - mysql-slave
+    restart: always
+    volumes:
+      - /home/lincoln/mysql/data/master:/var/lib/mysql
+  mycat-server:
+    image: unreal/mycat:1.6.5
+    ports:
+      - "8066:8066"
+    links:
+      - mysql-master
+      - mysql-slave
+    volumes:
+      - config/server.xml:/usr/local/mycat/conf/server.xml
+      - /mnt/mycatConf/rule.xml:/usr/local/mycat/conf/rule.xml
+      - /mnt/mycatConf/schema.xml:/usr/local/mycat/conf/schema.xml

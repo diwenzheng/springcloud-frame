@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+<mycat:schema xmlns:mycat="http://io.mycat/">
+
+    <!-- TESTDB1 是mycat的逻辑库名称，链接需要用的   testdb表示mycat虚拟的数据库 sqlMaxLimit 代表 默认添加 执行sql后缀-->
+    <schema name="testdb" checkSQLschema="false" sqlMaxLimit="100">
+        <table name="user_info" dataNode="dn$0-11"  rule="sharding-by-month"   primaryKey="id"/>
+        <table name="user_account" dataNode="dn$0-3"  rule="mod-long"   primaryKey="id"/>
+
+    </schema>
+    <!-- 配置 数据节点信息信息-->
+    <dataNode name="dn0" dataHost="mysqlDb" database="testdb0" />
+    <dataNode name="dn1" dataHost="mysqlDb" database="testdb1" />
+    <dataNode name="dn2" dataHost="mysqlDb" database="testdb2" />
+    <dataNode name="dn3" dataHost="mysqlDb" database="testdb3" />
+    <dataNode name="dn4" dataHost="mysqlDb" database="testdb4" />
+    <dataNode name="dn5" dataHost="mysqlDb" database="testdb5" />
+    <dataNode name="dn6" dataHost="mysqlDb" database="testdb6" />
+    <dataNode name="dn7" dataHost="mysqlDb" database="testdb7" />
+    <dataNode name="dn8" dataHost="mysqlDb" database="testdb8" />
+    <dataNode name="dn9" dataHost="mysqlDb" database="testdb9" />
+    <dataNode name="dn10" dataHost="mysqlDb" database="testdb10" />
+    <dataNode name="dn11" dataHost="mysqlDb" database="testdb11" />
+
+
+    <!-- database 是MySQL数据库的库名   虚拟数据库与真实数据库对应 -dataHost表示真实的数据库 database表示与真实的进行对应 ->
+    <dataNode name="dn1" dataHost="localhost1" database="test" />
+    <!-
+    dataNode节点中各属性说明：
+    name：指定逻辑数据节点名称；
+    dataHost：指定逻辑数据节点物理主机节点名称；
+    database：指定物理主机节点上。如果一个节点上有多个库，可使用表达式db$0-99，     表示指定0-99这100个数据库；
+
+    dataHost 节点中各属性说明：
+     name：物理主机节点名称；
+     maxCon：指定物理主机服务最大支持1000个连接；
+     minCon：指定物理主机服务最小保持10个连接；
+     writeType：指定写入类型；
+         0，只在writeHost节点写入；
+         1，在所有节点都写入。慎重开启，多节点写入顺序为默认写入根据配置顺序，第一个挂掉切换另一个；
+     dbType：指定数据库类型；
+     dbDriver：指定数据库驱动；
+     balance：指定物理主机服务的负载模式。
+         0，不开启读写分离机制；
+         1，全部的readHost与stand by writeHost参与select语句的负载均衡，简单的说，当双主双从模式(M1->S1，M2->S2，并且M1与 M2互为主备)，正常情况下，M2,S1,S2都参与select语句的负载均衡；
+         2，所有的readHost与writeHost都参与select语句的负载均衡，也就是说，当系统的写操作压力不大的情况下，所有主机都可以承担负载均衡；
+         3.所有的读操作都只发送到writeHost的readHost上
+    下面是读写分离的配置 如果是读走的url="192.168.91.9:3306"     如果是写走的的url="192.168.91.8:3306"
+
+    1. switchType='-1' 表示不自动切换
+    2. switchType='1' 默认值，表示自动切换
+    3. switchType='2' 基于MySQL主从同步的状态决定是否切换,心跳语句为 show slave status
+    4. switchType='3'基于MySQL galary cluster的切换机制（适合集群）（1.4.1），心跳语句为 show status like 'wsrep%'。
+
+    -->
+
+
+
+
+    <!-- 配置 主从读写分析节点信息-->
+    <dataHost name="mysqlDb" maxCon="1000" minCon="10" balance="3"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+        <heartbeat>select user()</heartbeat>
+        <!-- mysql-master 是 docker 启动时 link 的 数据库容器serviceName -->
+        <writeHost host="hostM1" url="mysql-master:3306" user="root" password="root">
+            <readHost host="hostS1" url="mysql-slave:3306" user="root" password="root" />
+        </writeHost>
+    </dataHost>
+</mycat:schema>
